@@ -1,10 +1,11 @@
+require('dotenv').config();
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const passport = require('./config/oauth');
-require('dotenv').config();
+
 
 const db = require('./config/db');
 const routes = require('./routes');

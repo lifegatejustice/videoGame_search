@@ -1,9 +1,9 @@
 // Entry point of the application.
 // Sets up Express server, middleware, and connects routes.
-
+require('dotenv').config();
 const express = require('express');
 const app = express();
-require('dotenv').config();
+
 
 const routes = require('./routes');
 const db = require('./database/connect');
