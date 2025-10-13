@@ -1,0 +1,517 @@
+openapi: 3.0.0
+info:
+  title: CSE341 Group Project API
+  description: API for managing games, characters, platforms, and users
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: https://your-render-app.onrender.com
+    description: Production server
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: token
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+        avatarUrl:
+          type: string
+        favorites:
+          type: array
+          items:
+            type: string
+
+    Game:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        releaseDate:
+          type: string
+          format: date
+        genres:
+          type: array
+          items:
+            type: string
+        developer:
+          type: string
+        publisher:
+          type: string
+        platforms:
+          type: array
+          items:
+            type: string
+        characters:
+          type: array
+          items:
+            type: string
+        ratingAverage:
+          type: number
+          minimum: 0
+          maximum: 10
+        coverImage:
+          type: string
+        createdBy:
+          type: string
+
+    Character:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        bio:
+          type: string
+        firstAppearance:
+          type: string
+        games:
+          type: array
+          items:
+            type: string
+        abilities:
+          type: array
+          items:
+            type: string
+        portraitUrl:
+          type: string
+
+    Platform:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        manufacturer:
+          type: string
+        releaseYear:
+          type: number
+        type:
+          type: string
+          enum: [console, handheld, pc, mobile, other]
+        logoUrl:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      responses:
+        200:
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  timestamp:
+                    type: string
+                  uptime:
+                    type: number
+
+  /auth/me:
+    get:
+      summary: Get current user profile
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/games:
+    get:
+      summary: Get all games
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: genre
+          in: query
+          schema:
+            type: string
+        - name: platform
+          in: query
+          schema:
+            type: string
+        - name: developer
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of games
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  games:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Game'
+                  pagination:
+                    type: object
+
+    post:
+      summary: Create a new game
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                releaseDate:
+                  type: string
+                  format: date
+                genres:
+                  type: array
+                  items:
+                    type: string
+                developer:
+                  type: string
+                publisher:
+                  type: string
+                platforms:
+                  type: array
+                  items:
+                    type: string
+                characters:
+                  type: array
+                  items:
+                    type: string
+                ratingAverage:
+                  type: number
+                  minimum: 0
+                  maximum: 10
+                coverImage:
+                  type: string
+      responses:
+        201:
+          description: Game created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+
+  /api/games/{id}:
+    get:
+      summary: Get game by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Game details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        404:
+          description: Game not found
+
+    put:
+      summary: Update game
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Game'
+      responses:
+        200:
+          description: Game updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Game not found
+
+    delete:
+      summary: Delete game
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Game deleted
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Game not found
+
+  /api/games/search:
+    get:
+      summary: Search games
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        200:
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  games:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Game'
+                  pagination:
+                    type: object
+
+  /api/characters:
+    get:
+      summary: Get all characters
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        200:
+          description: List of characters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  characters:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Character'
+                  pagination:
+                    type: object
+
+    post:
+      summary: Create a new character
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                bio:
+                  type: string
+                firstAppearance:
+                  type: string
+                games:
+                  type: array
+                  items:
+                    type: string
+                abilities:
+                  type: array
+                  items:
+                    type: string
+                portraitUrl:
+                  type: string
+      responses:
+        201:
+          description: Character created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Character'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+
+  /api/platforms:
+    get:
+      summary: Get all platforms
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        200:
+          description: List of platforms
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  platforms:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Platform'
+                  pagination:
+                    type: object
+
+    post:
+      summary: Create a new platform
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                manufacturer:
+                  type: string
+                releaseYear:
+                  type: number
+                type:
+                  type: string
+                  enum: [console, handheld, pc, mobile, other]
+                logoUrl:
+                  type: string
+      responses:
+        201:
+          description: Platform created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Platform'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+
+  /api/stats:
+    get:
+      summary: Get application statistics
+      responses:
+        200:
+          description: Application stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: integer
+                  games:
+                    type: integer
+                  characters:
+                    type: integer
+                  platforms:
+                    type: integer
