@@ -4,7 +4,7 @@
     "email": "alex@gmail.com",
     "favorites": ["The Witcher 3: Wild Hunt", "Elden Ring"],
     "rank": "Pro",
-    "date_of_registration": "2023-05-10",
+    "date_of_registration": { "$date": "2023-05-10T00:00:00Z" },
     "age": 27,
     "membership": "premium"
   },
@@ -13,7 +13,7 @@
     "email": "maria@gmail.com",
     "favorites": ["Horizon Zero Dawn", "Clair Obscur: Expedition 33"],
     "rank": "Intermediate",
-    "date_of_registration": "2022-11-03",
+    "date_of_registration": { "$date": "2022-11-03T00:00:00Z" },
     "age": 31,
     "membership": "free"
   },
@@ -22,7 +22,7 @@
     "email": "daniel@gmail.com",
     "favorites": ["Hades II", "Cyberpunk 2077"],
     "rank": "Expert",
-    "date_of_registration": "2021-08-22",
+    "date_of_registration": { "$date": "2021-08-22T00:00:00Z" },
     "age": 29,
     "membership": "premium"
   },
@@ -31,16 +31,19 @@
     "email": "sofia@gmail.com",
     "favorites": ["Silent Hill", "DOOM: The Dark Ages"],
     "rank": "Beginner",
-    "date_of_registration": "2024-02-14",
+    "date_of_registration": { "$date": "2024-02-14T00:00:00Z" },
     "age": 22,
     "membership": "free"
   },
   {
     "username": "michael",
     "email": "michael@gmail.com",
-    "favorites": ["Death Stranding 2: On the Beach", "Assassin's Creed Valhalla"],
+    "favorites": [
+      "Death Stranding 2: On the Beach",
+      "Assassin's Creed Valhalla"
+    ],
     "rank": "Pro",
-    "date_of_registration": "2023-09-30",
+    "date_of_registration": { "$date": "2023-09-30T00:00:00Z" },
     "age": 35,
     "membership": "premium"
   },
@@ -49,7 +52,7 @@
     "email": "emma@gmail.com",
     "favorites": ["Hollow Knight: Silksong", "Horizon Zero Dawn"],
     "rank": "Intermediate",
-    "date_of_registration": "2022-03-19",
+    "date_of_registration": { "$date": "2022-03-19T00:00:00Z" },
     "age": 26,
     "membership": "free"
   }
