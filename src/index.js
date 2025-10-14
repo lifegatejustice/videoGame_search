@@ -4,7 +4,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
+const sessionMiddleware = require('./middleware/sessionMiddleware');
 const swaggerUi = require('swagger-ui-express');
 const yaml = require('yamljs');
 const passport = require('./config/oauth');
@@ -38,16 +38,7 @@ app.use(cors({
 app.use(cookieParser());
 
 // Session middleware
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-  },
-}));
+app.use(sessionMiddleware);
 
 // Rate limiting
 const limiter = rateLimit({
