@@ -17,7 +17,7 @@ passport.use(new GoogleStrategy({
         username: profile.displayName,
         email: profile.emails[0].value,
         avatarUrl: profile.photos[0].value,
-        role: 'user',
+        role: 'admin',
       });
       await user.save();
     }
@@ -41,7 +41,7 @@ passport.use(new GitHubStrategy({
         username: profile.username,
         email: profile.emails ? profile.emails[0].value : null,
         avatarUrl: profile.photos[0].value,
-        role: 'user',
+        role: 'admin',
       });
       await user.save();
     }
