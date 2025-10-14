@@ -51,6 +51,6 @@ const gameSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-gameSchema.index({ title: 'text', description: 'text' });
+gameSchema.index({ title: 1, description: 1, developer: 1, publisher: 1 });
 
 module.exports = mongoose.model('Game', gameSchema);

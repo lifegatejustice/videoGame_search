@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -7,7 +8,8 @@ const cookieParser = require('cookie-parser');
 const sessionMiddleware = require('./middleware/sessionMiddleware');
 const swaggerUi = require('swagger-ui-express');
 const yaml = require('yamljs');
-const passport = require('./config/oauth');
+const passport = require('passport');
+require('./config/oauth');
 
 
 const db = require('./config/db');
@@ -52,9 +54,6 @@ app.use('/auth', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

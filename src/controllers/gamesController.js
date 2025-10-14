@@ -62,18 +62,31 @@ const searchGames = async (req, res) => {
       return res.status(400).json({ message: 'Search term required' });
     }
 
-    const games = await Game.find(
-      { $text: { $search: searchTerm } },
-      { score: { $meta: 'textScore' } }
-    )
+    // Use regex search instead of text index for broader compatibility
+    const regex = new RegExp(searchTerm, 'i');
+    const games = await Game.find({
+      $or: [
+        { title: regex },
+        { description: regex },
+        { developer: regex },
+        { publisher: regex },
+      ]
+    })
       .populate('platforms', 'name')
       .populate('characters', 'name')
       .select('-__v')
       .skip(skip)
       .limit(limit)
-      .sort({ score: { $meta: 'textScore' } });
+      .sort({ createdAt: -1 });
 
-    const total = await Game.countDocuments({ $text: { $search: searchTerm } });
+    const total = await Game.countDocuments({
+      $or: [
+        { title: regex },
+        { description: regex },
+        { developer: regex },
+        { publisher: regex },
+      ]
+    });
 
     res.json({
       games,

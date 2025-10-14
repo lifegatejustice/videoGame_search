@@ -1,5 +1,5 @@
 const express = require('express');
-const passport = require('../config/oauth');
+const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const { authenticateToken } = require('../middleware/authMiddleware');
 

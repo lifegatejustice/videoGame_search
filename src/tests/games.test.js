@@ -2,6 +2,7 @@ const request = require('supertest');
 const app = require('../index');
 const Game = require('../models/gameModel');
 const User = require('../models/userModel');
+const jwt = require('jsonwebtoken');
 
 describe('Games API', () => {
   let adminUser;
@@ -31,9 +32,9 @@ describe('Games API', () => {
     });
     await game.save();
 
-    // Mock JWT token
-    adminToken = 'admin-jwt-token';
-  });
+    // Generate real JWT token for admin
+    adminToken = jwt.sign({ id: adminUser._id }, process.env.JWT_SECRET || 'test-secret');
+  }, 30000);
 
   describe('GET /api/games', () => {
     it('should return list of games with pagination', async () => {
@@ -89,9 +90,21 @@ describe('Games API', () => {
     });
 
     it('should return 403 when user is not admin', async () => {
+      // Create a regular user
+      const regularUser = new User({
+        oauthProvider: 'google',
+        providerId: 'user123',
+        username: 'user',
+        email: 'user@test.com',
+        role: 'user',
+      });
+      await regularUser.save();
+
+      const userToken = jwt.sign({ id: regularUser._id }, process.env.JWT_SECRET || 'test-secret');
+
       const res = await request(app)
         .post('/api/games')
-        .set('Cookie', ['token=user-jwt-token'])
+        .set('Cookie', [`token=${userToken}`])
         .send({
           title: 'New Game',
           description: 'New game description',
@@ -123,9 +136,21 @@ describe('Games API', () => {
     });
 
     it('should return 403 when user is not admin', async () => {
+      // Create a regular user
+      const regularUser = new User({
+        oauthProvider: 'google',
+        providerId: 'user456',
+        username: 'user2',
+        email: 'user2@test.com',
+        role: 'user',
+      });
+      await regularUser.save();
+
+      const userToken = jwt.sign({ id: regularUser._id }, process.env.JWT_SECRET || 'test-secret');
+
       const res = await request(app)
         .put(`/api/games/${game._id}`)
-        .set('Cookie', ['token=user-jwt-token'])
+        .set('Cookie', [`token=${userToken}`])
         .send({ title: 'Updated Game' })
         .expect(403);
 
@@ -143,9 +168,21 @@ describe('Games API', () => {
     });
 
     it('should return 403 when user is not admin', async () => {
+      // Create a regular user
+      const regularUser = new User({
+        oauthProvider: 'google',
+        providerId: 'user789',
+        username: 'user3',
+        email: 'user3@test.com',
+        role: 'user',
+      });
+      await regularUser.save();
+
+      const userToken = jwt.sign({ id: regularUser._id }, process.env.JWT_SECRET || 'test-secret');
+
       const res = await request(app)
         .delete(`/api/games/${game._id}`)
-        .set('Cookie', ['token=user-jwt-token'])
+        .set('Cookie', [`token=${userToken}`])
         .expect(403);
 
       expect(res.body.message).toBe('Admin access required');
