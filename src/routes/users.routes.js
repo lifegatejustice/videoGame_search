@@ -1,5 +1,6 @@
 const express = require('express');
 const {
+  createUser,
   getUsers,
   getUserById,
   updateUser,
@@ -18,6 +19,9 @@ const {
 } = require('../middleware/validationMiddleware');
 
 const router = express.Router();
+
+// Create a new user (public endpoint)
+router.post('/', createUser);
 
 // Get all users (admin only)
 router.get('/', authenticateToken, requireAdmin, getUsers);

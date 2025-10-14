@@ -1,6 +1,35 @@
 const User = require('../models/userModel');
 const Game = require('../models/gameModel');
 
+// Create a new user
+const createUser = async (req, res) => {
+  try {
+    const { username, email, avatarUrl } = req.body;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User with this email already exists' });
+    }
+
+    const user = new User({
+      username,
+      email,
+      avatarUrl,
+      role: 'user', // Default role
+      favorites: []
+    });
+
+    const savedUser = await user.save();
+    res.status(201).json(savedUser);
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: 'Validation error', errors: error.errors });
+    }
+    res.status(500).json({ message: 'Error creating user' });
+  }
+};
+
 // Get all users (admin only)
 const getUsers = async (req, res) => {
   try {
@@ -136,6 +165,7 @@ const removeFromFavorites = async (req, res) => {
 };
 
 module.exports = {
+  createUser,
   getUsers,
   getUserById,
   updateUser,
