@@ -6,10 +6,10 @@
 - [x] Restructure project to src/ directory with subfolders (config, routes, controllers, services, models, middleware, utils, docs, tests)
 - [x] Move existing files to appropriate src/ subfolders
 - [x] Initialize ESLint and Prettier configurations
-- [ ] Update server.js to use new structure
+- [x] Update server.js to use new structure
 
 ## Database Models
-- [ ] Create Mongoose models for User, Game, Character, Platform
+- [x] Create Mongoose models for User, Game, Character, Platform
 - [ ] Update database/connect.js to use Mongoose instead of native MongoDB driver
 
 ## Authentication
@@ -26,11 +26,11 @@
 - [ ] Add file upload restrictions with Cloudinary
 
 ## API Endpoints
-- [ ] Implement CRUD for Users
-- [ ] Implement CRUD for Games (with search, pagination, cover upload)
+- [x] Implement CRUD for Users (basic GET, POST, PUT, DELETE)
+- [x] Implement CRUD for Games (basic GET, POST, PUT, DELETE with search, pagination)
 - [ ] Implement CRUD for Characters
 - [ ] Implement CRUD for Platforms (with games list)
-- [ ] Add /api/stats and /api/health endpoints
+- [x] Add /api/stats and /api/health endpoints
 
 ## Testing
 - [ ] Set up Jest and Supertest

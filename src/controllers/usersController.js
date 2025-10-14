@@ -4,7 +4,7 @@ const Game = require('../models/gameModel');
 // Create a new user
 const createUser = async (req, res) => {
   try {
-    const { username, email, avatarUrl } = req.body;
+    const { username, email, avatarUrl, oauthProvider, providerId } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -13,6 +13,8 @@ const createUser = async (req, res) => {
     }
 
     const user = new User({
+      oauthProvider,
+      providerId,
       username,
       email,
       avatarUrl,

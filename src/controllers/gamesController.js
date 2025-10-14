@@ -11,9 +11,9 @@ cloudinary.config({
 // Get all games with filters and pagination
 const getGames = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+    const page = req.query.page ? parseInt(req.query.page) : null;
+    const limit = req.query.limit ? parseInt(req.query.limit) : null;
+    const skip = page && limit ? (page - 1) * limit : 0;
 
     const filter = {};
     if (req.query.genre) {
@@ -26,25 +26,33 @@ const getGames = async (req, res) => {
       filter.developer = new RegExp(req.query.developer, 'i');
     }
 
-    const games = await Game.find(filter)
+    let query = Game.find(filter)
       .populate('platforms', 'name')
       .populate('characters', 'name')
       .select('-__v')
-      .skip(skip)
-      .limit(limit)
       .sort({ createdAt: -1 });
+
+    if (page && limit) {
+      query = query.skip(skip).limit(limit);
+    }
+
+    const games = await query;
 
     const total = await Game.countDocuments(filter);
 
-    res.json({
-      games,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
-    });
+    if (page && limit) {
+      res.json({
+        games,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit),
+        },
+      });
+    } else {
+      res.json({ games });
+    }
   } catch (error) {
     res.status(500).json({ message: 'Error fetching games' });
   }
