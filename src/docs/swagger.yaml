@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:3000
     description: Development server
-  - url: https://your-render-app.onrender.com
+  - url: https://videogame-search.onrender.com
     description: Production server
 
 components:
