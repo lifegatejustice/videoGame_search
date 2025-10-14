@@ -1,6 +1,23 @@
 const express = require('express');
 const router = express.Router();
 
+// Root endpoint
+router.get('/', (req, res) => {
+  res.json({
+    message: 'CSE341 Group Project API is running',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/auth',
+      users: '/api/users',
+      games: '/api/games',
+      characters: '/api/characters',
+      platforms: '/api/platforms',
+      docs: '/api-docs'
+    }
+  });
+});
+
 // Health check endpoint
 router.get('/api/health', (req, res) => {
   res.status(200).json({

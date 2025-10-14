@@ -26,7 +26,7 @@ router.get('/google/callback',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    res.redirect(process.env.FRONTEND_URL || 'http://localhost:3000');
+    res.redirect(process.env.FRONTEND_URL || 'https://videogame-search.onrender.com~');
   }
 );
 
