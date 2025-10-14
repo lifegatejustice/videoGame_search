@@ -4,6 +4,9 @@ const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const swaggerUi = require('swagger-ui-express');
+const yaml = require('yamljs');
 const passport = require('./config/oauth');
 
 
@@ -13,6 +16,9 @@ const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Load Swagger document
+const swaggerDocument = yaml.load('./src/docs/swagger.yaml');
 
 // Security middleware
 app.use(helmet({
@@ -31,6 +37,18 @@ app.use(cors({
 }));
 app.use(cookieParser());
 
+// Session middleware
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  },
+}));
+
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -45,6 +63,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Passport middleware
 app.use(passport.initialize());
+app.use(passport.session());
+
+// Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Routes
 app.use('/', routes);
@@ -57,6 +79,7 @@ db.connect()
   .then(() => {
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
+      console.log(`Swagger docs available at http://localhost:${port}/api-docs`);
     });
   })
   .catch((err) => {
