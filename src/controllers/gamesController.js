@@ -8,54 +8,23 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Get all games with filters and pagination
+// Get all games
 const getGames = async (req, res) => {
-  try {
-    const page = req.query.page ? parseInt(req.query.page) : null;
-    const limit = req.query.limit ? parseInt(req.query.limit) : null;
-    const skip = page && limit ? (page - 1) * limit : 0;
+ try{
+  const games = await Game.find();
+  res.status(200).json({
+    success: true,
+    count: games.length,
+    data: games
+  });
+ } catch (error) {
+  res.status(500).json({
+    success: false,
+    message: 'Server Error',
+    error: error.message
+  });
 
-    const filter = {};
-    if (req.query.genre) {
-      filter.genres = { $in: req.query.genre.split(',') };
-    }
-    if (req.query.platform) {
-      filter.platforms = req.query.platform;
-    }
-    if (req.query.developer) {
-      filter.developer = new RegExp(req.query.developer, 'i');
-    }
-
-    let query = Game.find(filter)
-      .populate('platforms', 'name')
-      .populate('characters', 'name')
-      .select('-__v')
-      .sort({ createdAt: -1 });
-
-    if (page && limit) {
-      query = query.skip(skip).limit(limit);
-    }
-
-    const games = await query;
-
-    const total = await Game.countDocuments(filter);
-
-    if (page && limit) {
-      res.json({
-        games,
-        pagination: {
-          page,
-          limit,
-          total,
-          pages: Math.ceil(total / limit),
-        },
-      });
-    } else {
-      res.json({ games });
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching games' });
-  }
+ }
 };
 
 // Search games

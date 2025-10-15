@@ -195,34 +195,7 @@ paths:
         403:
           description: Forbidden
 
-    post:
-      summary: Create user profile
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - username
-                - email
-              properties:
-                username:
-                  type: string
-                email:
-                  type: string
-                avatarUrl:
-                  type: string
-      responses:
-        201:
-          description: User created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        400:
-          description: Validation error
-
+    
   /api/users/{userId}:
     get:
       summary: Get user profile
