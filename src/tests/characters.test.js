@@ -44,6 +44,32 @@ describe('Characters API', () => {
       expect(res.body).toHaveProperty('pagination');
       expect(Array.isArray(res.body.characters)).toBe(true);
     });
+
+    it('should handle invalid page parameter', async () => {
+      const res = await request(app)
+        .get('/api/characters?page=invalid')
+        .expect(400);
+
+      expect(res.body.message).toBe('Invalid query parameters');
+    });
+
+    it('should handle invalid limit parameter', async () => {
+      const res = await request(app)
+        .get('/api/characters?limit=invalid')
+        .expect(400);
+
+      expect(res.body.message).toBe('Invalid query parameters');
+    });
+
+    it('should return empty array when no characters exist', async () => {
+      await Character.deleteMany({});
+      const res = await request(app)
+        .get('/api/characters')
+        .expect(200);
+
+      expect(res.body.characters).toEqual([]);
+      expect(res.body.pagination.total).toBe(0);
+    });
   });
 
   describe('GET /api/characters/:id', () => {
@@ -63,6 +89,14 @@ describe('Characters API', () => {
         .expect(404);
 
       expect(res.body.message).toBe('Character not found');
+    });
+
+    it('should handle invalid character ID format', async () => {
+      const res = await request(app)
+        .get('/api/characters/invalid-id')
+        .expect(400);
+
+      expect(res.body.message).toBe('Invalid character ID format');
     });
   });
 

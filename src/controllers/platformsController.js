@@ -26,6 +26,10 @@ const getPlatforms = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error('Error fetching platforms:', error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid query parameters' });
+    }
     res.status(500).json({ message: 'Error fetching platforms' });
   }
 };
@@ -42,6 +46,10 @@ const getPlatformById = async (req, res) => {
 
     res.json(platform);
   } catch (error) {
+    console.error('Error fetching platform:', error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid platform ID format' });
+    }
     res.status(500).json({ message: 'Error fetching platform' });
   }
 };
@@ -54,6 +62,13 @@ const createPlatform = async (req, res) => {
 
     res.status(201).json(platform);
   } catch (error) {
+    console.error('Error creating platform:', error);
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: 'Validation error', errors: error.errors });
+    }
+    if (error.code === 11000) {
+      return res.status(409).json({ message: 'Platform with this name already exists' });
+    }
     res.status(500).json({ message: 'Error creating platform' });
   }
 };
@@ -73,6 +88,16 @@ const updatePlatform = async (req, res) => {
 
     res.json(platform);
   } catch (error) {
+    console.error('Error updating platform:', error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid platform ID format' });
+    }
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: 'Validation error', errors: error.errors });
+    }
+    if (error.code === 11000) {
+      return res.status(409).json({ message: 'Platform with this name already exists' });
+    }
     res.status(500).json({ message: 'Error updating platform' });
   }
 };
@@ -88,6 +113,10 @@ const deletePlatform = async (req, res) => {
 
     res.json({ message: 'Platform deleted successfully' });
   } catch (error) {
+    console.error('Error deleting platform:', error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid platform ID format' });
+    }
     res.status(500).json({ message: 'Error deleting platform' });
   }
 };
@@ -118,6 +147,10 @@ const getGamesByPlatform = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error('Error fetching games for platform:', error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid platform ID format' });
+    }
     res.status(500).json({ message: 'Error fetching games for platform' });
   }
 };

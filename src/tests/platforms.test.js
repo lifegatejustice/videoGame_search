@@ -46,6 +46,32 @@ describe('Platforms API', () => {
       expect(res.body).toHaveProperty('pagination');
       expect(Array.isArray(res.body.platforms)).toBe(true);
     });
+
+    it('should handle invalid page parameter', async () => {
+      const res = await request(app)
+        .get('/api/platforms?page=invalid')
+        .expect(400);
+
+      expect(res.body.message).toBe('Invalid query parameters');
+    });
+
+    it('should handle invalid limit parameter', async () => {
+      const res = await request(app)
+        .get('/api/platforms?limit=invalid')
+        .expect(400);
+
+      expect(res.body.message).toBe('Invalid query parameters');
+    });
+
+    it('should return empty array when no platforms exist', async () => {
+      await Platform.deleteMany({});
+      const res = await request(app)
+        .get('/api/platforms')
+        .expect(200);
+
+      expect(res.body.platforms).toEqual([]);
+      expect(res.body.pagination.total).toBe(0);
+    });
   });
 
   describe('GET /api/platforms/:id', () => {
@@ -65,6 +91,14 @@ describe('Platforms API', () => {
         .expect(404);
 
       expect(res.body.message).toBe('Platform not found');
+    });
+
+    it('should handle invalid platform ID format', async () => {
+      const res = await request(app)
+        .get('/api/platforms/invalid-id')
+        .expect(400);
+
+      expect(res.body.message).toBe('Invalid platform ID format');
     });
   });
 
@@ -158,6 +192,14 @@ describe('Platforms API', () => {
       expect(res.body).toHaveProperty('games');
       expect(res.body).toHaveProperty('pagination');
       expect(Array.isArray(res.body.games)).toBe(true);
+    });
+
+    it('should handle invalid platform ID format', async () => {
+      const res = await request(app)
+        .get('/api/platforms/invalid-id/games')
+        .expect(400);
+
+      expect(res.body.message).toBe('Invalid platform ID format');
     });
   });
 });

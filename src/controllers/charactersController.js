@@ -26,6 +26,10 @@ const getCharacters = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error('Error fetching characters:', error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid query parameters' });
+    }
     res.status(500).json({ message: 'Error fetching characters' });
   }
 };
@@ -43,6 +47,10 @@ const getCharacterById = async (req, res) => {
 
     res.json(character);
   } catch (error) {
+    console.error('Error fetching character:', error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid character ID format' });
+    }
     res.status(500).json({ message: 'Error fetching character' });
   }
 };
@@ -57,6 +65,13 @@ const createCharacter = async (req, res) => {
 
     res.status(201).json(character);
   } catch (error) {
+    console.error('Error creating character:', error);
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: 'Validation error', errors: error.errors });
+    }
+    if (error.code === 11000) {
+      return res.status(409).json({ message: 'Character with this name already exists' });
+    }
     res.status(500).json({ message: 'Error creating character' });
   }
 };
@@ -78,6 +93,16 @@ const updateCharacter = async (req, res) => {
 
     res.json(character);
   } catch (error) {
+    console.error('Error updating character:', error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid character ID format' });
+    }
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: 'Validation error', errors: error.errors });
+    }
+    if (error.code === 11000) {
+      return res.status(409).json({ message: 'Character with this name already exists' });
+    }
     res.status(500).json({ message: 'Error updating character' });
   }
 };
@@ -93,6 +118,10 @@ const deleteCharacter = async (req, res) => {
 
     res.json({ message: 'Character deleted successfully' });
   } catch (error) {
+    console.error('Error deleting character:', error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid character ID format' });
+    }
     res.status(500).json({ message: 'Error deleting character' });
   }
 };
