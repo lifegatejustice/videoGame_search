@@ -1,35 +1,16 @@
 const Platform = require('../models/platformModel');
 const Game = require('../models/gameModel');
 
-// Get all platforms with pagination
+// Get all platforms without pagination and filtering
 const getPlatforms = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
     const platforms = await Platform.find()
       .select('-__v')
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 });
+      .sort({ name: 1 });
 
-    const total = await Platform.countDocuments();
-
-    res.json({
-      platforms,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
-    });
+    res.json(platforms);
   } catch (error) {
     console.error('Error fetching platforms:', error);
-    if (error.name === 'CastError') {
-      return res.status(400).json({ message: 'Invalid query parameters' });
-    }
     res.status(500).json({ message: 'Error fetching platforms' });
   }
 };

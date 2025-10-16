@@ -100,22 +100,31 @@ const getGameById = async (req, res) => {
 
 // Create game (admin only)
 const createGame = async (req, res) => {
-  try {
-    const gameData = {
-      ...req.body,
-      createdBy: req.user._id,
-    };
-
-    const game = new Game(gameData);
-    await game.save();
-
-    await game.populate('platforms', 'name');
-    await game.populate('characters', 'name');
-
-    res.status(201).json(game);
-  } catch (error) {
-    res.status(500).json({ message: 'Error creating game' });
+try {
+  const game = await Game.create(req.body);
+  res.status(201).json({
+    success: true,
+    data: game
+  });
+} catch (error) {
+  if (error.name === 'ValidationError') {
+    const messages = Object.values(error.errors).map(val => val.message);
+    return res.status(400).json({
+      success: false,
+      error: messages
+    });
   }
+  if (error.code === 11000) {
+    return res.status(409).json({
+      success: false,
+      error: 'Game with this title already exists'
+    });
+  }
+  res.status(500).json({
+    success: false,
+    error: 'Error creating game'
+  });
+}
 };
 
 // Update game (admin only)

@@ -1,38 +1,21 @@
 const Character = require('../models/characterModel');
 
-// Get all characters with pagination
+// Get all characters without pagination and filtering
 const getCharacters = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
     const characters = await Character.find()
-      .populate('games', 'title')
+      .populate('games', 'title coverImage releaseDate')
       .select('-__v')
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 });
+      .sort({ name: 1 });
 
-    const total = await Character.countDocuments();
-
-    res.json({
-      characters,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
-    });
+    res.json(characters);
   } catch (error) {
     console.error('Error fetching characters:', error);
-    if (error.name === 'CastError') {
-      return res.status(400).json({ message: 'Invalid query parameters' });
-    }
     res.status(500).json({ message: 'Error fetching characters' });
   }
 };
+
+
 
 // Get character by ID
 const getCharacterById = async (req, res) => {
