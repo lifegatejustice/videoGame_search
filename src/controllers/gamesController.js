@@ -99,13 +99,20 @@ const getGameById = async (req, res) => {
 };
 
 // Create game (admin only)
+// Create game (admin only)
 const createGame = async (req, res) => {
   try {
-    const game = await Game.create(req.body);
+    const gameData = {
+      ...req.body,
+      createdBy: req.user?._id || req.body.createdBy // fallback for manual testing
+    };
+
+    const game = await Game.create(gameData);
     res.status(201).json({
       success: true,
       data: game
     });
+    
   } catch (error) {
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(val => val.message);
@@ -126,6 +133,7 @@ const createGame = async (req, res) => {
     });
   }
 };
+
 
 // Update game (admin only)
 const updateGame = async (req, res) => {
