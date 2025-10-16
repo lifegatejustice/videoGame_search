@@ -101,12 +101,7 @@ const getGameById = async (req, res) => {
 // Create game (admin only)
 const createGame = async (req, res) => {
   try {
-    const gameData = {
-      ...req.body,
-      createdBy: req.user._id, // Set createdBy to the authenticated user's ID
-    };
-
-    const game = await Game.create(gameData);
+    const game = await Game.create(req.body);
     res.status(201).json({
       success: true,
       data: game
