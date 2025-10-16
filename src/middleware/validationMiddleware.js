@@ -43,6 +43,34 @@ const validateGameCreation = [
     .optional()
     .isArray()
     .withMessage('Genres must be an array'),
+  body('platforms')
+    .optional()
+    .isArray()
+    .withMessage('Platforms must be an array')
+    .custom((value) => {
+      if (value && value.length > 0) {
+        for (const id of value) {
+          if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+            throw new Error('Each platform ID must be a valid ObjectId');
+          }
+        }
+      }
+      return true;
+    }),
+  body('characters')
+    .optional()
+    .isArray()
+    .withMessage('Characters must be an array')
+    .custom((value) => {
+      if (value && value.length > 0) {
+        for (const id of value) {
+          if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+            throw new Error('Each character ID must be a valid ObjectId');
+          }
+        }
+      }
+      return true;
+    }),
   body('ratingAverage')
     .optional()
     .isFloat({ min: 0, max: 10 })
